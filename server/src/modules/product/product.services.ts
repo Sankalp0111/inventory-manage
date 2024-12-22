@@ -18,6 +18,7 @@ class ProductServices extends BaseServices<any> {
    * Create new product
    */
   async create(payload: IProduct, userId: string) {
+    console.log("payload:",payload)
     type str = keyof IProduct;
     (Object.keys(payload) as str[]).forEach((key: str) => {
       if (payload[key] === '') {
@@ -26,15 +27,16 @@ class ProductServices extends BaseServices<any> {
     });
 
     payload.user = new Types.ObjectId(userId);
-    const session = await mongoose.startSession();
+    // const session = await mongoose.startSession();
 
     try {
-      session.startTransaction();
+      // session.startTransaction();
 
       const seller = await Seller.findById(payload.seller);
-      const product: any = await this.model.create([payload], { session });
-
-      await Purchase.create(
+      const product: any = await this.model.create([payload]);
+      console.log(seller)
+      console.log(product)
+      const productt = await Purchase.create(
         [
           {
             user: userId,
@@ -46,18 +48,17 @@ class ProductServices extends BaseServices<any> {
             unitPrice: Number(product[0]?.price),
             totalPrice: Number(product[0]?.stock) * Number(product[0]?.price)
           }
-        ],
-        { session }
+        ]
       );
 
-      await session.commitTransaction();
-
+      // await session.commitTransaction();
+      console.log(productt)
       return product;
     } catch (error) {
-      await session.abortTransaction();
+      // await session.abortTransaction();
       throw new CustomError(400, 'Product create failed');
     } finally {
-      await session.endSession();
+      // await session.endSession();
     }
   }
 

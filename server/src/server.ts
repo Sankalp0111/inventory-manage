@@ -7,9 +7,9 @@ let server: Server;
 
 async function main() {
   try {
-    await mongoose.connect(config.database_url as string);
+    await mongoose.connect("mongodb://localhost:27017/imsss");
 
-    server = app.listen(config.port, () => {
+    server = app.listen(8000, () => {
       console.log(`app is listening on port ${config.port}`);
     });
   } catch (err) {
